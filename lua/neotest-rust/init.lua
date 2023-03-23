@@ -112,28 +112,27 @@ function adapter.discover_positions(path)
     local query = [[
 (
   (attribute_item
-    [
-      (attribute
+    (attribute
+      [
         (identifier) @macro_name
-      )
-      (attribute
-        [
-	  (identifier) @macro_name
-	  (scoped_identifier
-	    name: (identifier) @macro_name
-          )
-        ]
-      )
-    ]
-  )+
+        (scoped_identifier
+          name: (identifier) @macro_name
+        )
+      ]
+    )
+  )
+  (attribute_item
+    (attribute
+      (identifier)
+    )
+  )*
   .
   (function_item
     name: (identifier) @test.name
   ) @test.definition
-  (#contains? @macro_name "test" "rstest" "case")
-
+  (mod_item name: (identifier) @namespace.name)? @namespace.definition
+  (#any-of? @macro_name "test" "rstest" "case")
 )
-(mod_item name: (identifier) @namespace.name)? @namespace.definition
     ]]
 
     return lib.treesitter.parse_positions(path, query, {
